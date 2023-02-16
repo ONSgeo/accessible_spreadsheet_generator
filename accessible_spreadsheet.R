@@ -7,10 +7,8 @@ library(writexl)
 
 #get some data :)
 
-setwd("D:/Helen/Geospatial_Team_2022/Accessible_spreadsheets/data/")
-
-raw_data <- read_csv("Happiness.csv")
-LAD_lu <- read_xlsx("LAD22_CTY22_RGN22_CTRY22_UK_LU.xlsx")
+raw_data <- read_csv("data/Happiness.csv")
+LAD_lu <- read_xlsx("data/LAD22_CTY22_RGN22_CTRY22_UK_LU.xlsx")
 
 names(raw_data)
 
@@ -32,15 +30,65 @@ lads_1c <- raw_data %>% filter(str_detect(AREACD, str_c(LADs, collapse = "|")))
 #TODO can we find a way to automatically detect entity codes across all unknown columns?
 
 #combine entity codes into geographic levels = eg. LADS (where multiple entity codes are represented as a single geog)
+####Hierarchy Vectors####
 RGNs = c("E12")
-CTYUAs = c()
-LADs = c("W06", "E09", "E08", "E07", "E06", "S12", "N09")
+CTYAUTHs = c("E10", "E11", "E61", "E47")
+LADUAs = c("W06", "E09", "E08", "E07", "E06", "S12", "N09")
 #?Are we going to do combined census geogs across countries?
+#TODO where in the hierarchy do we want UAs (W06, E06, S12, N09) to sit?
+#TODO Do we want to include Country level (Wales, Scotland, NI) to sit in RGNs?
+
 
 #next task: write a function that will take in a bigger geography, find out what type of geog it is, then look in the hierarchy to find out what sits beneath
 #and does that smaller geog exist in the raw_data ? If answer is yes, then look through each big entity and extract all the smaller ones that belong to it
 #(using the LU)
 #might need to create multiple functions
+
+#Working with one code manually to begin with.
+test_rgn <- "E12000001"
+
+#Extracting the first 3 chars of the 9 char Geography code
+entity_check <- substr(test_rgn, 1,3)
+
+#Creating a function that will compare the extracted 3 chars from the entity(or many entities) with a specified hierarchy vector and return a TRUE/FALSE result
+hierarchy_check <- function(entity, hierarchy_vector){
+  if (entity %in% hierarchy_vector){
+    return(TRUE)
+  } 
+  else {
+    return(FALSE)
+  }
+}
+
+#run the function to check a single entity in the entity_check object against the CTYAUTHs vector
+hierarchy_results <- hierarchy_check(entity_check, RGNs)
+
+#to check multiple entities (define them as a vector first!) and specify the hierarchy vector to check against
+#lapply(entity_check, hierarchy_check, RGNs)
+
+#function to check the higher level geography and return what lower level geographies are within it (from the hierarchy list)
+smaller_geog_extractor <- function(hierarchy_results, entity_check, hierarchy_list){
+  if(hierarchy_results == TRUE){
+    return(unname(unlist(hierarchy_list[entity_check]))) #TODO error checking here so that it goes to the else statement if no data returned from list
+  } else {
+    message("Input entity not found in this geography level. No results returned.")
+  }
+}
+
+#run the above function
+lower_test <- smaller_geog_extractor(hierarchy_results, entity_check, hierarchy_list)
+
+
+#the hierarchy lookup list of doom - we are ignoring CTYS for now because they're complicated
+hierarchy_list <- list("E12" = c("W06", "E09", "E08", "E07", "E06", "S12", "N09"), #regions E12 to LADS
+                       "E09" = "E05", # LADs to Wards
+                       "E08" = "E05",
+                       "E07" = "E05",
+                       "E06" = "E05")
+
+#check for the presence of LTLA codes in the AREACD field of the raw_data using a vector - must collapse down the vector to make it work.
+raw_entity_check <- raw_data %>% filter(str_detect(AREACD, str_c(lower_test, collapse = "|")))
+
 
 ####CODING THE GEOGRAPHICAL HIERARCHY INTO COLUMN/CELL ARRANGEMENT####
 
