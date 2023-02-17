@@ -86,8 +86,34 @@ hierarchy_list <- list("E12" = c("W06", "E09", "E08", "E07", "E06", "S12", "N09"
                        "E07" = "E05",
                        "E06" = "E05")
 
+#create a filtered dataframe containing all codes matching
+raw_filter <- filter(raw_data, str_detect(AREACD, str_c(lower_test, collapse = "|")))
+
+#function exploration
+entity_data_presence <- function(raw_filter){
+  if(nrow(raw_filter) == 0){
+    return(FALSE)
+  } else {
+    return(TRUE)
+  }
+}
+
+#TODO Fix the filtering and TRUE/FALSE assessment in the following function. The function preceeding this is a bodge for now.
 #check for the presence of LTLA codes in the AREACD field of the raw_data using a vector - must collapse down the vector to make it work.
-raw_entity_check <- raw_data %>% filter(str_detect(AREACD, str_c(lower_test, collapse = "|")))
+# entity_data_presence <- function(raw_data, code_col, lower_geogs){
+#   if(nrow(filter(raw_data, str_detect(code_col, str_c(lower_geogs, collapse = "|")))) == 0){
+#     return(FALSE)
+#     } else {
+#       return(TRUE)
+#   }
+# }
+
+#using the function above to check the raw_filter df
+entity_data_presence(raw_filter)
+
+#creating a filtered df of the lookup table returning all entities that match the specified code in test_rgn and ordering them ascending order.
+LAD_filter <- filter(LAD_lu, RGN22CD == test_rgn) %>% 
+  arrange(., LAD22CD)
 
 
 ####CODING THE GEOGRAPHICAL HIERARCHY INTO COLUMN/CELL ARRANGEMENT####
