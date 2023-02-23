@@ -21,16 +21,38 @@ unique_entities <- unique(ent_data$ENTCD)
 #TODO check the unique_entities %in% is assessing all entities against the defined vector
 #then use an if statement to load in the appropriate lookup based on what hierarchy the entity code falls in
 if(unique_entities %in% c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E10", "E11", "E12", "E13", "W92", "W06", "S92", "S12", "N92", "N09") == TRUE){
-  lookup <- read_csv("lookups/CTRY22_NAT22_RGN22_CTYUA22_LAD22_lookup.csv") #admin hierarchy lookup
+  lookup <- read_csv("lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv") #admin hierarchy lookup
 } else {
   message("Lookup not found")
 }
 
-input_data_col_name <- "AREACD"
+input_data_col_name <- "AREA21CD"
 #join the raw_data to the appropriate lookup
-ent_data_join <- left_join(lookup, ent_data, by = c("AREA22CD" = input_data_col_name))
-#QA checks to make sure everything has joined correctly - number of rows, what entities have NA values and which cols
-na_data <- filter(ent_data_join, is.na(Value) == TRUE)
+ent_data_join <- left_join(lookup, ent_data, by = c("AREA21CD" = input_data_col_name))
+
+#QA checks to make sure everything has joined correctly - number of rows, what entities have NA in the Values column
+
+#anti join - tell us what hasn't joined
+anti_join_check <- function(lookup, input_data, input_data_col_name){
+  anti_join_data <- anti_join(lookup, input_data, by = c("AREA21CD" = input_data_col_name))  
+  
+  if(nrow(anti_join_data) > 0){
+    message("Unmatched rows found. Check output results prior to proceeding.")
+    message("Printing output results to console.")
+    print(anti_join_data)
+    return(anti_join_data)
+  } else if (nrow(anti_join_data) == 0){
+    message("No unmatched rows found :)") 
+  } else {
+    message("Unable to check. Please review inputs.")
+  }
+}
+
+test <- anti_join_check(lookup, ent_data, input_data_col_name)
+
+output <- filter(ent_data_join, !input_data_col_name %in% test$AREA21CD)
+#TODO fix this row above!
+
 #prep the data for export
 # :)
 

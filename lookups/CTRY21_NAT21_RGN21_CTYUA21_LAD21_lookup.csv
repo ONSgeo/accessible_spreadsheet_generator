@@ -131,7 +131,7 @@ E06000019,,,,"Herefordshire, County of",
 E06000051,,,,Shropshire,
 E06000021,,,,Stoke-on-Trent,
 E06000020,,,,Telford and Wrekin,
-,,,,Staffordshire,
+E10000028,,,,Staffordshire,
 E07000192,,,,,Cannock Chase
 E07000193,,,,,East Staffordshire
 E07000194,,,,,Lichfield
@@ -140,20 +140,13 @@ E07000196,,,,,South Staffordshire
 E07000197,,,,,Stafford
 E07000198,,,,,Staffordshire Moorlands
 E07000199,,,,,Tamworth
-,,,,Warwickshire,
+E10000031,,,,Warwickshire,
 E07000218,,,,,North Warwickshire
 E07000219,,,,,Nuneaton and Bedworth
 E07000220,,,,,Rugby
 E07000221,,,,,Stratford-on-Avon
 E07000222,,,,,Warwick
-,,,,Worcestershire,
-E07000234,,,,,Bromsgrove
-E07000235,,,,,Malvern Hills
-E07000236,,,,,Redditch
-E07000237,,,,,Worcester
-E07000238,,,,,Wychavon
-E07000239,,,,,Wyre Forest
-,,,,West Midlands,
+E11000005,,,,West Midlands,
 E08000025,,,,,Birmingham
 E08000026,,,,,Coventry
 E08000027,,,,,Dudley
@@ -161,6 +154,13 @@ E08000028,,,,,Sandwell
 E08000029,,,,,Solihull
 E08000030,,,,,Walsall
 E08000031,,,,,Wolverhampton
+E10000034,,,,Worcestershire,
+E07000234,,,,,Bromsgrove
+E07000235,,,,,Malvern Hills
+E07000236,,,,,Redditch
+E07000237,,,,,Worcester
+E07000238,,,,,Wychavon
+E07000239,,,,,Wyre Forest
 E12000006,,,East of England,,
 E06000055,,,,Bedford,
 E06000056,,,,Central Bedfordshire,
@@ -228,7 +228,7 @@ E09000028,,,,,Southwark
 E09000030,,,,,Tower Hamlets
 E09000032,,,,,Wandsworth
 E09000033,,,,,Westminster
-,,,,Outer London,
+E13000002,,,,Outer London,
 E09000002,,,,,Barking and Dagenham
 E09000003,,,,,Barnet
 E09000004,,,,,Bexley
