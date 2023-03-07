@@ -22,9 +22,23 @@ unique_entities <- unique(ent_data$ENTCD)
 #then use an if statement to load in the appropriate lookup based on what hierarchy the entity code falls in
 if(unique_entities %in% c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E10", "E11", "E12", "E13", "W92", "W06", "S92", "S12", "N92", "N09") == TRUE){
   lookup <- read_csv("lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv") #admin hierarchy lookup
-} else {
+  message("Loading Admin hierarchy Lookup")
+} else if(unique_entities %in% c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E38", "E40", "E54") == TRUE){
+  health_lookup <- read_csv("lookups/CTRY21_NAT21_NHSER21_STP21_CCG21_LAD21_lookup.csv") #health hierarchy lookup
+  message("Loading Health hierarchy Lookup")
+} else {  
   message("Lookup not found")
 }
+
+#create more hierarchy lookups e.g. health, census 2011 and 2021 (separate), ITL hierarchy, admin (previous years), Fire
+#add them into the if statement above. Use else if and add message stating which hierarchy lookup is being loaded.
+#stretch - make it load in the correct year, looking for geogs that have changed - using full 9char code. look for entity and the changed geog code
+#turn the above if into a function e.g. lookup_loader
+#find out how to get R to prompt the user to define a column where the data is  - input_data_col_name
+#try and fix the TODO on line 68
+#any other QA checks to test for?
+#try and fix the Ynys Mon char TODO. Follow it from the input to the output to check it's not the data itself to begin with.
+#finish off the output formatting of the workbook - try and make it more generic by using functions
 
 input_data_col_name <- "AREA21CD"
 #join the raw_data to the appropriate lookup
