@@ -8,6 +8,12 @@ raw_data <- read_csv("data/Happiness.csv")
 #using head of data for testing, because of special o character Ynys Mon
 raw_head <- head(raw_data)
 
+#create a dummy df for health lookup test
+raw_data <- data.frame(AREACD = c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E38", "E40", "E54"), 
+                          data = c(12, 3, 56, 20, 8, 4, 7, 17, 19, 5, 1))
+
+
+
 ####Preparing data layout####
 
 #create a new col in raw_data with the first 3 char of the entity code in it
@@ -18,16 +24,42 @@ distinct_entities <- ent_data %>% distinct(ENTCD, .keep_all = FALSE)
 #or use this in base R to create a vector
 unique_entities <- unique(ent_data$ENTCD)
 
-#TODO check the unique_entities %in% is assessing all entities against the defined vector
-#then use an if statement to load in the appropriate lookup based on what hierarchy the entity code falls in
-if(unique_entities %in% c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E10", "E11", "E12", "E13", "W92", "W06", "S92", "S12", "N92", "N09") == TRUE){
-  lookup <- read_csv("lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv") #admin hierarchy lookup
-  message("Loading Admin hierarchy Lookup")
-} else if(unique_entities %in% c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E38", "E40", "E54") == TRUE){
-  health_lookup <- read_csv("lookups/CTRY21_NAT21_NHSER21_STP21_CCG21_LAD21_lookup.csv") #health hierarchy lookup
-  message("Loading Health hierarchy Lookup")
-} else {  
-  message("Lookup not found")
+#TODO See if we can add a successfully loaded message to the ifelse statements in this function
+
+# lookup_loader <- function(unique_entities){
+#   if(exists("lookup_link") == FALSE){
+#     lookup_link <- ifelse(unique_entities %in% c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E10", "E11", "E12", "E13", "W92", "W06", "S92", "S12", "N92", "N09"), 
+#                         "lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv", message(""))
+#     message("Loading Admin lookup")
+#     } else if(exists("lookup_link") == FALSE){
+#     lookup_link <- ifelse(unique_entities %in% c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E38", "E40", "E54"), 
+#                         "lookups/CTRY21_NAT21_NHSER21_STP21_CCG21_LAD21_lookup.csv", message(""))
+#     message("Loading Health lookup")
+#     } else {
+#     message("No Lookups found")
+#   }
+#   
+#   #lookup <- read_csv(lookup_link)
+#   #return(lookup)
+#   return(lookup_link)
+# }
+# 
+# lookup <- lookup_loader(unique_entities)
+
+
+#experimenting with case_when
+lookup_link <- case_when(unique_entities %in% c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E10", "E11", "E12", "E13", "W92", "W06", "S92", "S12", "N92", "N09") ~ "lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv",
+                 unique_entities %in% c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E38", "E40", "E54") ~ "lookups/CTRY21_NAT21_NHSER21_STP21_CCG21_LAD21_lookup.csv")
+
+unique_check <- length(unique(lookup_link)) == 1
+
+if(unique_check == TRUE){
+  lookup <- read_csv(lookup_link)
+  message("Lookup successfully loaded")
+} else if(unique_check == FALSE){
+  message("Write more code to find the correct lookup")
+} else {
+  message("No lookup found :(")
 }
 
 #create more hierarchy lookups e.g. health, census 2011 and 2021 (separate), ITL hierarchy, admin (previous years), Fire
