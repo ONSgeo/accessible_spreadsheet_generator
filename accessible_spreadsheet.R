@@ -4,7 +4,6 @@
 #turn the above if into a function e.g. lookup_loader
 #any other QA checks to test for?
 #finish off the output formatting of the workbook - try and make it more generic by using functions
-#wb - remove unwanted columns from the output xlsx e.g ENTCD
 #wb - write tidy data column - case_when and collapse down. Codes and Data only.
 
 library(tidyverse)
@@ -92,7 +91,7 @@ if(unique_check == TRUE){
 
 #TODO check column names and inputs
 ####Joining data to the lookup####
-input_data_col_name <- "AREACD"
+input_data_col_name <- "AREA21CD"
 #join the raw_data to the appropriate lookup
 raw_data_join <- left_join(lookup, raw_data, by = c("AREA21CD" = input_data_col_name))
 
@@ -118,7 +117,16 @@ anti_join_check <- function(lookup, input_data, input_data_col_name){
 anti_join_test <- anti_join_check(lookup, raw_data, input_data_col_name)
 #TODO create an export of unmatched data
 
-output <- filter(raw_data_join, !input_data_col_name %in% anti_join_test$AREA21CD)
+####Preparing data for output####
+
+data_col_pos <- menu(colnames(raw_data), graphics = FALSE, title = "Select the column containing the data variable for publication")
+data_col <- colnames(raw_data)[data_col_pos]
+lookup_col_no <- ncol(lookup)
+
+#remove excess columns
+raw_data_join <- select(raw_data_join, 1:all_of(lookup_col_no), all_of(data_col))
+
+output <- filter(raw_data_join, (AREA21CD %in% anti_join_test$AREA21CD) == FALSE)
 
 
 ####Excel export formatting####
