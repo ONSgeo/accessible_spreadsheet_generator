@@ -5,19 +5,13 @@
 #any other QA checks to test for?
 #finish off the output formatting of the workbook - try and make it more generic by using functions
 #wb - write tidy data column - case_when and collapse down. Codes and Data only.
+#move functions into another r script and tidy up this one for users.
+#two hierarchies scenario? export and run the unjoined data through the process again to create another workbook? >:)
+
 
 library(tidyverse)
 library(readxl)
 library(openxlsx)
-
-####Reference Data: Entity Vectors and Hierachy Links####
-admin_entities <- c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E10", "E11", "E12", "E13", "W92", "W06", "S92", "S12", "N92", "N09")
-health_entities <- c("E38", "E40", "E54")
-itl_entities <- c("TLN", "TLM", "TLD", "TLC", "TLE", "TLL", "TLG", "TLF", "TLH", "TLJ", "TLI", "TLK")
-census_entities <- c("E00", "S00", "W00", "N00", "E01", "S01", "W01", "E02", "S02", "W02")
-
-admin_link <- "lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv"
-health_link <- "lookups/CTRY21_NAT21_NHSER21_STP21_CCG21_LAD21_lookup.csv"
 
 #make a function to ask the user their filename using readline, load that data in, then do the ent_data
 load_user_data <- function(){
@@ -26,7 +20,6 @@ load_user_data <- function(){
   if(grepl(".csv", filepath) == TRUE){
     if(file.exists(filepath) == TRUE){
       user_data <- read.csv(filepath)
-      #user_data <- read_csv(filepath, show_col_types = FALSE, locale = readr::locale(encoding = "UTF-8"))
       AREACD_pos <- menu(colnames(user_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes")
       AREACD <- colnames(user_data)[AREACD_pos]
       user_data <- user_data %>% mutate(ENTCD = substr(AREACD, 1, 3))
@@ -61,33 +54,63 @@ raw_data <- load_user_data()
 raw_data <- data.frame(AREACD = c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E38", "E40", "E54"), 
                           data = c(12, 3, 56, 20, 8, 4, 7, 17, 19, 5, 1))
 
-#do unique on that col to get a list of all the entity codes that are used in our data
-distinct_entities <- raw_data %>% distinct(ENTCD, .keep_all = FALSE)
-#or use this in base R to create a vector
-unique_entities <- unique(raw_data$ENTCD)
+create_unique_entities <- function(raw_data){
+  unique_entities <- unique(raw_data$ENTCD) #create a vector of all unique entity codes in the input data
+  return(unique_entities)
+}
 
+unique_entities <- create_unique_entities(raw_data)
 
 ####Loading correct lookup####
-#TODO two hierarchies scenario?
-#TODO add code to select the correct year of the admin hierarchy
 
-lookup_link <- case_when(unique_entities %in% admin_entities ~ admin_link,
-                 unique_entities %in% health_entities ~ health_link)
-
-unique_check <- length(unique(lookup_link)) == 1
-
-if(unique_check == TRUE){
-  lookup <- read.csv(unique(lookup_link))
-  message("Lookup successfully loaded")
-} else if(unique_check == FALSE){
-  if(length(unique(lookup_link)) == 2 & admin_link %in% lookup_link){
-    lookup_link <- setdiff(lookup_link, admin_link)
-    lookup <- read.csv(lookup_link)
+lookup_loader <- function(unique_entities){
+  ##Reference Data: Entity Vectors and Hierachy Links##
+  admin_entities <- c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E10", "E11", "E12", "E13", "W92", "W06", "S92", "S12", "N92", "N09")
+  health_entities <- c("E38", "E40", "E54")
+  itl_entities <- c("TLN", "TLM", "TLD", "TLC", "TLE", "TLL", "TLG", "TLF", "TLH", "TLJ", "TLI", "TLK")
+  census_entities <- c("E00", "S00", "W00", "N00", "E01", "S01", "W01", "E02", "S02", "W02")
+  
+  admin_link <- "lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv"
+  health_link <- "lookups/CTRY21_NAT21_NHSER21_STP21_CCG21_LAD21_lookup.csv"
+  census_link <- "lookups/MSOA21_LSOA21_OA21_lookup.csv"
+  itl_link <- "lookups/ITL121_ITL221_ITL321_lookup.csv"
+  
+  ##function begins here##
+  #checks for the presence of entities contained in unique_entities, in the admin, health etc entity vectors
+  #produces a vector with the correct lookup link
+  lookup_link <- case_when(unique_entities %in% admin_entities ~ admin_link,
+                           unique_entities %in% health_entities ~ health_link,
+                           unique_entities %in% itl_entities ~ itl_link,
+                           unique_entities %in% census_entities ~ census_link)
+  
+  #checks to see whether the lookup link is unique, or if there are multiple lookups selected
+  unique_check <- length(unique(lookup_link)) == 1
+  
+  #if the lookup link is unique, then that lookup will be read in using the lookup_link
+  #if not unique, then checks to see if admin is present with another lookup, if so then the alternative lookup will be selected
+  if(unique_check == TRUE){
+    lookup <- read.csv(unique(lookup_link))
     message("Lookup successfully loaded")
+    return(lookup)
+  } else if(unique_check == FALSE){
+    if(length(unique(lookup_link)) == 2 & admin_link %in% lookup_link){
+      lookup_link <- setdiff(lookup_link, admin_link)
+      lookup <- read.csv(lookup_link)
+      message("Lookup successfully loaded")
+      return(lookup)
+    } else if(length(unique(lookup_link)) >= 3 | (length(unique(lookup_link)) >= 2 & !(admin_link %in% lookup_link))){
+      lookup_link_pos <- menu(unique(lookup_link), graphics = FALSE, title = "Multiple potential lookups found. Select the desired lookup from these options:")
+      lookup_link <- unique(lookup_link)[lookup_link_pos] 
+      lookup <- read.csv(lookup_link)
+      message("Lookup successfully loaded")
+      return(lookup)
+    }
+  } else {
+    message("No matching lookup found :(")
   }
-} else {
-  message("No lookup found :(")
 }
+
+lookup <- lookup_loader(unique_entities)
 
 #TODO check column names and inputs
 ####Joining data to the lookup####
