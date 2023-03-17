@@ -1,18 +1,19 @@
 ####TODO list
 #create more hierarchy lookups e.g. health, census 2011 and 2021 (separate), ITL hierarchy, admin (previous years), Fire
-#stretch - make it load in the correct year, looking for geogs that have changed - using full 9char code. look for entity and the changed geog code
-#turn the above if into a function e.g. lookup_loader
-#any other QA checks to test for?
+#Make the lookup_loader function load in the correct year, looking for geogs that have changed - using full 9char code. look for entity and the changed geog code
 #finish off the output formatting of the workbook - try and make it more generic by using functions
 #wb - write tidy data column - case_when and collapse down. Codes and Data only.
 #move functions into another r script and tidy up this one for users.
 #two hierarchies scenario? export and run the unjoined data through the process again to create another workbook? >:)
+#create a function to create and export unmatched data (that doesn't join to the lookup)
+#add export on the unmatched lookup check function
 
 
 library(tidyverse)
 library(readxl)
 library(openxlsx)
 
+####Load and prepare data####
 #make a function to ask the user their filename using readline, load that data in, then do the ent_data
 load_user_data <- function(){
   filepath <- readline(prompt = "Insert the filepath for your input data: \n")
@@ -47,12 +48,11 @@ load_user_data <- function(){
 
 raw_data <- load_user_data()
 
-####Load and prepare data####
 #raw_data <- read_csv("data/Happiness.csv")
 
 #create a dummy df for health lookup test
-raw_data <- data.frame(AREACD = c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E38", "E40", "E54"), 
-                          data = c(12, 3, 56, 20, 8, 4, 7, 17, 19, 5, 1))
+#raw_data <- data.frame(AREACD = c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E38", "E40", "E54"), 
+                          #data = c(12, 3, 56, 20, 8, 4, 7, 17, 19, 5, 1))
 
 create_unique_entities <- function(raw_data){
   unique_entities <- unique(raw_data$ENTCD) #create a vector of all unique entity codes in the input data
@@ -130,8 +130,13 @@ raw_data_join <- data_joiner(raw_data, lookup)
 #QA checks to make sure everything has joined correctly - number of rows, what entities have NA in the Values column
 
 #anti join - tell us what hasn't joined
-anti_join_check <- function(lookup, input_data, input_data_col_name){
-  anti_join_data <- anti_join(lookup, input_data, by = c("AREA21CD" = input_data_col_name))  
+unmatched_lookup_check <- function(lookup, raw_data){
+  input_data_col_name_pos <- menu(colnames(raw_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the input data:")
+  input_data_col_name <- colnames(raw_data)[input_data_col_name_pos]
+  lookup_col_name_pos <- menu(colnames(lookup), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the lookup:")
+  lookup_col_name <- colnames(lookup)[lookup_col_name_pos]
+  
+  anti_join_data <- anti_join(lookup, raw_data, by = setNames(input_data_col_name, lookup_col_name))  
   
   if(nrow(anti_join_data) > 0){
     message("Unmatched rows found. Check output results prior to proceeding.")
@@ -145,8 +150,8 @@ anti_join_check <- function(lookup, input_data, input_data_col_name){
   }
 }
 
-anti_join_test <- anti_join_check(lookup, raw_data, input_data_col_name)
-#TODO create an export of unmatched data
+anti_join_test <- unmatched_lookup_check(lookup, raw_data)
+
 
 ####Preparing data for output####
 
