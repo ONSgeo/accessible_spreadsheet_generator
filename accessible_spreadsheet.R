@@ -112,11 +112,19 @@ lookup_loader <- function(unique_entities){
 
 lookup <- lookup_loader(unique_entities)
 
-#TODO check column names and inputs
 ####Joining data to the lookup####
-input_data_col_name <- "AREA21CD"
-#join the raw_data to the appropriate lookup
-raw_data_join <- left_join(lookup, raw_data, by = c("AREA21CD" = input_data_col_name))
+
+data_joiner <- function(raw_data, lookup){
+  input_data_col_name_pos <- menu(colnames(raw_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the input data:")
+  input_data_col_name <- colnames(raw_data)[input_data_col_name_pos]
+  lookup_col_name_pos <- menu(colnames(lookup), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the lookup:")
+  lookup_col_name <- colnames(lookup)[lookup_col_name_pos]
+  raw_data_join <- left_join(lookup, raw_data, by = setNames(input_data_col_name, lookup_col_name)) #using setnames inverts the input variable order
+  message("Data successfully joined")
+  return(raw_data_join)
+}
+
+raw_data_join <- data_joiner(raw_data, lookup) 
 
 ####QA Checks####
 #QA checks to make sure everything has joined correctly - number of rows, what entities have NA in the Values column
