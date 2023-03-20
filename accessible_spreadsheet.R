@@ -5,8 +5,6 @@
 #wb - write tidy data column - case_when and collapse down. Codes and Data only.
 #move functions into another r script and tidy up this one for users.
 #two hierarchies scenario? export and run the unjoined data through the process again to create another workbook? >:)
-#create a function to create and export unmatched data (that doesn't join to the lookup)
-#add export on the unmatched lookup check function
 
 
 library(tidyverse)
@@ -112,36 +110,39 @@ lookup_loader <- function(unique_entities){
 
 lookup <- lookup_loader(unique_entities)
 
-####Joining data to the lookup####
-
-data_joiner <- function(raw_data, lookup){
+####Define column names for later use####
+define_col_names <- function(lookup, raw_data){
   input_data_col_name_pos <- menu(colnames(raw_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the input data:")
   input_data_col_name <- colnames(raw_data)[input_data_col_name_pos]
   lookup_col_name_pos <- menu(colnames(lookup), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the lookup:")
   lookup_col_name <- colnames(lookup)[lookup_col_name_pos]
+  return(list(input_data_col_name, lookup_col_name))
+} 
+
+define_col_names_result <- define_col_names(lookup, raw_data)
+input_data_col_name <- define_col_names_result[1] %>% unlist()
+lookup_col_name <- define_col_names_result[2] %>% unlist()
+
+####Joining data to the lookup####
+
+data_joiner <- function(raw_data, lookup, input_data_col_name, lookup_col_name){
   raw_data_join <- left_join(lookup, raw_data, by = setNames(input_data_col_name, lookup_col_name)) #using setnames inverts the input variable order
   message("Data successfully joined")
   return(raw_data_join)
 }
 
-raw_data_join <- data_joiner(raw_data, lookup) 
+raw_data_join <- data_joiner(raw_data, lookup, input_data_col_name, lookup_col_name) 
 
 ####QA Checks####
 #QA checks to make sure everything has joined correctly - number of rows, what entities have NA in the Values column
 
 #anti join - tell us what hasn't joined
-unmatched_lookup_check <- function(lookup, raw_data){
-  input_data_col_name_pos <- menu(colnames(raw_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the input data:")
-  input_data_col_name <- colnames(raw_data)[input_data_col_name_pos]
-  lookup_col_name_pos <- menu(colnames(lookup), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the lookup:")
-  lookup_col_name <- colnames(lookup)[lookup_col_name_pos]
+unmatched_lookup_check <- function(lookup, raw_data, input_data_col_name, lookup_col_name){
   
   anti_join_data <- anti_join(lookup, raw_data, by = setNames(input_data_col_name, lookup_col_name))  
   
   if(nrow(anti_join_data) > 0){
-    message("Unmatched rows found. Check output results prior to proceeding.")
-    message("Printing output results to console.")
-    print(anti_join_data)
+    message("Unmatched rows in the lookup found. Check output results prior to proceeding.")
     return(anti_join_data)
   } else if (nrow(anti_join_data) == 0){
     message("No unmatched rows found :)") 
@@ -150,52 +151,84 @@ unmatched_lookup_check <- function(lookup, raw_data){
   }
 }
 
-anti_join_test <- unmatched_lookup_check(lookup, raw_data)
+unmatched_lookup_test <- unmatched_lookup_check(lookup, raw_data, input_data_col_name, lookup_col_name)
 
+unmatched_data_check <- function(lookup, raw_data, input_data_col_name, lookup_col_name){
+  
+  anti_join_data <- anti_join(raw_data, lookup, by = setNames(lookup_col_name, input_data_col_name))  
+  
+  if(nrow(anti_join_data) > 0){
+    message("Unmatched data found. Check output results prior to proceeding.")
+    return(anti_join_data)
+  } else if (nrow(anti_join_data) == 0){
+    message("No unmatched data found :)") 
+  } else {
+    message("Unable to check. Please review inputs.")
+  }
+}
+
+unmatched_data_test <- unmatched_data_check(lookup, raw_data, input_data_col_name, lookup_col_name)
+
+export_tests <- function(unmatched_lookup_test, unmatched_data_test){
+  timestamp <- format(Sys.time(), "%Y%m%d_%H%M")
+  write.csv(unmatched_lookup_test, paste0("output/unmatched_lookup_results_", timestamp, ".csv"), row.names = FALSE)
+  write.csv(unmatched_data_test, paste0("output/unmatched_data_results_", timestamp, ".csv"), row.names = FALSE)
+}
+
+export_tests(unmatched_lookup_test, unmatched_data_test)
 
 ####Preparing data for output####
 
-data_col_pos <- menu(colnames(raw_data), graphics = FALSE, title = "Select the column containing the data variable for publication")
-data_col <- colnames(raw_data)[data_col_pos]
-lookup_col_no <- ncol(lookup)
-
-#remove excess columns
-raw_data_join <- select(raw_data_join, 1:all_of(lookup_col_no), all_of(data_col))
-
-output <- filter(raw_data_join, (AREA21CD %in% anti_join_test$AREA21CD) == FALSE)
-
+output_preparation <- function(raw_data_join, lookup, unmatched_lookup_test, input_data_col_name, lookup_col_name){
+  data_col_pos <- menu(colnames(raw_data_join), graphics = FALSE, title = "Select the column containing the data variable for publication")
+  data_col <- colnames(raw_data_join)[data_col_pos]
+  lookup_col_no <- ncol(lookup)
+  raw_data_join <- select(raw_data_join, 1:all_of(lookup_col_no), all_of(data_col)) #remove excess columns
+  unmatched_lookup_codes <- unmatched_lookup_test[,lookup_col_name]
+  output <- filter(raw_data_join, (raw_data_join[,lookup_col_name] %in% unmatched_lookup_codes) == FALSE)
+  message("Data ready for output.")
+  message("Reminder: Run QA checks before exporting to file to ensure all data is accounted for")
+  return(output)
+}
+  
+output <- output_preparation(raw_data_join, lookup, unmatched_lookup_test, input_data_col_name, lookup_col_name)  
 
 ####Excel export formatting####
 
-#styles
-hsbold <- createStyle(textDecoration = "Bold")
-hs1 <- createStyle(fontSize = 18, textDecoration = "Bold")
+export_workbook <- function(output){
+  #styles
+  hsbold <- createStyle(textDecoration = "Bold")
+  hs1 <- createStyle(fontSize = 18, textDecoration = "Bold")
+  
+  #Using openxlsx to create and format a new xlsx workbook
+  wb <- createWorkbook() #create the workbook
+  modifyBaseFont(wb, fontSize = 12, fontColour = 'black', fontName = "Arial") #define the font, size & colour
+  
+  #add sheets to the workbook
+  addWorksheet(wb, sheetName = "Cover Sheet", gridLines = TRUE)
+  addWorksheet(wb, sheetName = "Accessible Data", gridLines = TRUE)
+  addWorksheet(wb, sheetName = "Tidy Data", gridLines = TRUE)
+  
+  #write data to sheet 1
+  writeData(wb, 1, "Listing geographical areas in tables - best practice examples", startCol = "A", startRow = 1)
+  writeData(wb, 1, "This spreadsheet contains two worksheets. Each includes a table that lists geographical areas.", startCol = "A", startRow = 2)
+  writeData(wb, 1, "One shows an accessible layout which meets the accessibility legislation that came into force in September 2020.", startCol = "A", startRow = 3)
+  writeData(wb, 1, "The other shows a 'tidy data' layout which is useful for machine readability. ", startCol = "A", startRow = 4)
+  addStyle(wb, 1, hs1, rows = 1, cols = 1)
+  
+  #write data to sheet 2
+  writeData(wb, 2, "Layout of geographical areas - accessible version", startCol = "A", startRow = 1)
+  writeData(wb, 2, "This worksheet contains one table. The table contains some blank cells due to the layout of the geographical areas.", startCol = "A", startRow = 2)
+  writeData(wb, sheet = 2, output, startCol = "A", startRow = 3, headerStyle = hsbold)
+  addStyle(wb, 2, hs1, rows = 1, cols = 1)
+  
+  #write the workbook
+  output_filepath <- readline(prompt = "Insert output filepath and filename, e.g. output/output_file.xlsx :")
+  saveWorkbook(wb, output_filepath, overwrite = TRUE)
+  message("Output exported to ", output_filepath)
+}
 
-#Using openxlsx to create and format a new xlsx workbook
-wb <- createWorkbook() #create the workbook
-modifyBaseFont(wb, fontSize = 12, fontColour = 'black', fontName = "Arial") #define the font, size & colour
-
-#add sheets to the workbook
-addWorksheet(wb, sheetName = "Cover Sheet", gridLines = TRUE)
-addWorksheet(wb, sheetName = "Accessible Data", gridLines = TRUE)
-addWorksheet(wb, sheetName = "Tidy Data", gridLines = TRUE)
-
-#write data to sheet 1
-writeData(wb, 1, "Listing geographical areas in tables - best practice examples", startCol = "A", startRow = 1)
-writeData(wb, 1, "This spreadsheet contains two worksheets. Each includes a table that lists geographical areas.", startCol = "A", startRow = 2)
-writeData(wb, 1, "One shows an accessible layout which meets the accessibility legislation that came into force in September 2020.", startCol = "A", startRow = 3)
-writeData(wb, 1, "The other shows a 'tidy data' layout which is useful for machine readability. ", startCol = "A", startRow = 4)
-addStyle(wb, 1, hs1, rows = 1, cols = 1)
-
-#write data to sheet 2
-writeData(wb, 2, "Layout of geographical areas - accessible version", startCol = "A", startRow = 1)
-writeData(wb, 2, "This worksheet contains one table. The table contains some blank cells due to the layout of the geographical areas.", startCol = "A", startRow = 2)
-writeData(wb, sheet = 2, output, startCol = "A", startRow = 3, headerStyle = hsbold)
-addStyle(wb, 2, hs1, rows = 1, cols = 1)
-
-
-#write the workbook
-saveWorkbook(wb, "output/test_output_formatting.xlsx", overwrite = TRUE)
+export_workbook(output)
 
 # ʕ·ᴥ·ʔ
 # :)
