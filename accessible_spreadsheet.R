@@ -21,7 +21,7 @@ load_user_data <- function(){
       user_data <- read.csv(filepath)
       AREACD_pos <- menu(colnames(user_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes")
       AREACD <- colnames(user_data)[AREACD_pos]
-      user_data <- user_data %>% mutate(ENTCD = substr(AREACD, 1, 3))
+      user_data <- user_data %>% mutate(ENTCD = str_sub(.[,AREACD], 1, 3))
       message("Input data successfully loaded")
       return(user_data)
     } else if(file.exists(filepath) == FALSE){
@@ -33,7 +33,7 @@ load_user_data <- function(){
       user_data <- read_excel(filepath)
       AREACD_pos <- menu(colnames(user_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes")
       AREACD <- colnames(user_data)[AREACD_pos]
-      user_data <- user_data %>% mutate(ENTCD = substr(AREACD, 1, 3))
+      user_data <- user_data %>% mutate(ENTCD = str_sub(.[,AREACD], 1, 3))
       message("Input data successfully loaded")
       return(user_data)
     } else if(file.exists(filepath) == FALSE){
