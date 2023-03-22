@@ -1,6 +1,6 @@
 ####TODO list
 #create more hierarchy lookups e.g. health, census 2011 and 2021 (separate), ITL hierarchy, admin (previous years), Fire
-#finish off the output formatting of the workbook - run through the ONS accessibility checker tool
+#ONS accessibility checker tool - Cell A1 should use Heading 1 style?
 #move functions into another r script and tidy up this one for users.
 #two hierarchies scenario? export and run the unjoined data through the process again to create another workbook? >:)
 #test data - data/wellbeing_testdata_2021.csv
@@ -9,6 +9,7 @@
 library(tidyverse)
 library(readxl)
 library(openxlsx)
+library(janitor)
 
 ####Load and prepare data####
 #make a function to ask the user their filename using readline, load that data in, then do the ent_data
@@ -67,10 +68,10 @@ lookup_loader <- function(raw_data, unique_entities){
   itl_entities <- c("TLN", "TLM", "TLD", "TLC", "TLE", "TLL", "TLG", "TLF", "TLH", "TLJ", "TLI", "TLK")
   census_entities <- c("E00", "S00", "W00", "N00", "E01", "S01", "W01", "E02", "S02", "W02")
   
-  admin_link <- c(admin_20_link, admin_21_link, admin_22_link) #make sure all admin lookups are included in this vector
   admin_20_link <- "lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv"
   admin_21_link <- "lookups/CTRY21_NAT21_RGN21_CTYUA21_LAD21_lookup.csv"
   admin_22_link <- "lookups/CTRY22_NAT22_RGN22_CTYUA22_LAD22_lookup.csv"
+  admin_link <- c(admin_20_link, admin_21_link, admin_22_link) #make sure all admin lookups are included in this vector
   health_link <- "lookups/CTRY21_NAT21_NHSER21_STP21_CCG21_LAD21_lookup.csv"
   census_link <- "lookups/MSOA21_LSOA21_OA21_lookup.csv"
   itl_link <- "lookups/ITL121_ITL221_ITL321_lookup.csv"
@@ -193,20 +194,18 @@ output_preparation <- function(raw_data_join, lookup, unmatched_lookup_test, inp
   lookup_col_no <- ncol(lookup)
   raw_data_join <- select(raw_data_join, 1:all_of(lookup_col_no), all_of(data_col)) #remove excess columns
   unmatched_lookup_codes <- unmatched_lookup_test[,lookup_col_name]
-  human_output <- filter(raw_data_join, (raw_data_join[,lookup_col_name] %in% unmatched_lookup_codes) == FALSE)
+  human_output <- filter(raw_data_join, (raw_data_join[,lookup_col_name] %in% unmatched_lookup_codes) == FALSE) %>% clean_names(case = "title")
   #preparing the tidy data sheet
-  machine_output <- human_output %>% unite("Names", 2:ncol(lookup), remove = TRUE, na.rm = TRUE)
-  return(list(human_output, machine_output))
-  
+  machine_output <- human_output %>% unite("Names", 2:all_of(lookup_col_no), sep = "", remove = TRUE, na.rm = TRUE) %>% clean_names()
   message("Data ready for output.")
   message("Reminder: Run QA checks before exporting to file to ensure all data is accounted for")
-  return(output)
+  return(list(human_output, machine_output))
 }
   
 output <- output_preparation(raw_data_join, lookup, unmatched_lookup_test, input_data_col_name, lookup_col_name)
 
-human_output <- output[1] %>% unlist()
-machine_output <- output[2] %>% unlist()
+human_output <- output[[1]]
+machine_output <- output[[2]]
 
 ####Excel export formatting####
 
@@ -216,7 +215,8 @@ export_workbook <- function(human_output, machine_output){
   hs1 <- createStyle(fontSize = 18, textDecoration = "Bold")
   
   #Using openxlsx to create and format a new xlsx workbook
-  wb <- createWorkbook() #create the workbook
+  wb_title <- readline(prompt = "Input the title of your workbook for Excel title metadata: ")
+  wb <- createWorkbook(title = wb_title) #create the workbook
   modifyBaseFont(wb, fontSize = 12, fontColour = 'black', fontName = "Arial") #define the font, size & colour
   
   #add sheets to the workbook
@@ -241,12 +241,12 @@ export_workbook <- function(human_output, machine_output){
   writeData(wb, sheet = 3, machine_output, startCol = "A", startRow = 1)
   
   #write the workbook
-  output_filepath <- readline(prompt = "Insert output filepath and filename, e.g. output/output_file.xlsx :")
-  saveWorkbook(wb, output_filepath, overwrite = TRUE)
-  message("Output exported to ", output_filepath)
+  output_filepath <- readline(prompt = "Input output filepath and filename, e.g. output/output_file: ")
+  saveWorkbook(wb, paste0(output_filepath, ".xlsx"), overwrite = TRUE)
+  message("Output exported to ", output_filepath, ".xlsx")
 }
 
-export_workbook(output)
+export_workbook(human_output, machine_output)
 
 # ʕ·ᴥ·ʔ
 # :)
