@@ -1,11 +1,10 @@
 ####TODO list
 #create more hierarchy lookups e.g. health, census 2011 and 2021 (separate), ITL hierarchy, admin (previous years), Fire
-#Make the lookup_loader function load in the correct year, looking for geogs that have changed - using full 9char code. look for entity and the changed geog code
 #finish off the output formatting of the workbook - run through the ONS accessibility checker tool
 #wb - write tidy data column - case_when and collapse down. Codes and Data only.
 #move functions into another r script and tidy up this one for users.
 #two hierarchies scenario? export and run the unjoined data through the process again to create another workbook? >:)
-#work out how to create ENTCD when code field is not AREACD in the load_user_data function - data/wellbeing_testdata_2021.csv
+#test data - data/wellbeing_testdata_2021.csv
 
 
 library(tidyverse)
