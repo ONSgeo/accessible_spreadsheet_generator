@@ -1,10 +1,11 @@
 ####TODO list
 #create more hierarchy lookups e.g. health, census 2011 and 2021 (separate), ITL hierarchy, admin (previous years), Fire
 #Make the lookup_loader function load in the correct year, looking for geogs that have changed - using full 9char code. look for entity and the changed geog code
-#finish off the output formatting of the workbook - try and make it more generic by using functions
+#finish off the output formatting of the workbook - run through the ONS accessibility checker tool
 #wb - write tidy data column - case_when and collapse down. Codes and Data only.
 #move functions into another r script and tidy up this one for users.
 #two hierarchies scenario? export and run the unjoined data through the process again to create another workbook? >:)
+#work out how to create ENTCD when code field is not AREACD in the load_user_data function - data/wellbeing_testdata_2021.csv
 
 
 library(tidyverse)
@@ -61,25 +62,32 @@ unique_entities <- create_unique_entities(raw_data)
 
 ####Loading correct lookup####
 
-lookup_loader <- function(unique_entities){
+lookup_loader <- function(raw_data, unique_entities){
   ##Reference Data: Entity Vectors and Hierachy Links##
   admin_entities <- c("K02","K03", "K04", "E92", "E06", "E07", "E08", "E09", "E10", "E11", "E12", "E13", "W92", "W06", "S92", "S12", "N92", "N09")
   health_entities <- c("E38", "E40", "E54")
   itl_entities <- c("TLN", "TLM", "TLD", "TLC", "TLE", "TLL", "TLG", "TLF", "TLH", "TLJ", "TLI", "TLK")
   census_entities <- c("E00", "S00", "W00", "N00", "E01", "S01", "W01", "E02", "S02", "W02")
   
-  admin_link <- "lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv"
+  admin_link <- c(admin_20_link, admin_21_link, admin_22_link) #make sure all admin lookups are included in this vector
+  admin_20_link <- "lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv"
+  admin_21_link <- "lookups/CTRY21_NAT21_RGN21_CTYUA21_LAD21_lookup.csv"
+  admin_22_link <- "lookups/CTRY22_NAT22_RGN22_CTYUA22_LAD22_lookup.csv"
   health_link <- "lookups/CTRY21_NAT21_NHSER21_STP21_CCG21_LAD21_lookup.csv"
   census_link <- "lookups/MSOA21_LSOA21_OA21_lookup.csv"
   itl_link <- "lookups/ITL121_ITL221_ITL321_lookup.csv"
   
   ##function begins here##
+  admin_code_pos <- menu(colnames(raw_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the input data:")
+  admin_code_name <- colnames(raw_data)[admin_code_pos]
   #checks for the presence of entities contained in unique_entities, in the admin, health etc entity vectors
   #produces a vector with the correct lookup link
-  lookup_link <- case_when(unique_entities %in% admin_entities ~ admin_link,
+  #when adding new years of lookups, they **MUST** be above the older ones of the same geography (case_when works from top to bottom - newest lookup to oldest)
+  lookup_link <- case_when((unique_entities %in% admin_entities & ("E06000061" %in% raw_data[,admin_code_name]|"E06000062" %in% raw_data[,admin_code_name])) ~ admin_21_link,
+                           (unique_entities %in% admin_entities & ("E06000060" %in% raw_data[,admin_code_name])) ~ admin_20_link,
                            unique_entities %in% health_entities ~ health_link,
                            unique_entities %in% itl_entities ~ itl_link,
-                           unique_entities %in% census_entities ~ census_link)
+                           unique_entities %in% census_entities ~ census_link) %>% discard(is.na)
   
   #checks to see whether the lookup link is unique, or if there are multiple lookups selected
   unique_check <- length(unique(lookup_link)) == 1
@@ -108,7 +116,7 @@ lookup_loader <- function(unique_entities){
   }
 }
 
-lookup <- lookup_loader(unique_entities)
+lookup <- lookup_loader(raw_data, unique_entities)
 
 ####Define column names for later use####
 define_col_names <- function(lookup, raw_data){
