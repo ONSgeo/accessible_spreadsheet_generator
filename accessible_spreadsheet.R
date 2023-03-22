@@ -1,7 +1,6 @@
 ####TODO list
 #create more hierarchy lookups e.g. health, census 2011 and 2021 (separate), ITL hierarchy, admin (previous years), Fire
 #finish off the output formatting of the workbook - run through the ONS accessibility checker tool
-#wb - write tidy data column - case_when and collapse down. Codes and Data only.
 #move functions into another r script and tidy up this one for users.
 #two hierarchies scenario? export and run the unjoined data through the process again to create another workbook? >:)
 #test data - data/wellbeing_testdata_2021.csv
@@ -127,6 +126,7 @@ define_col_names <- function(lookup, raw_data){
 } 
 
 define_col_names_result <- define_col_names(lookup, raw_data)
+
 input_data_col_name <- define_col_names_result[1] %>% unlist()
 lookup_col_name <- define_col_names_result[2] %>% unlist()
 
@@ -176,33 +176,41 @@ unmatched_data_check <- function(lookup, raw_data, input_data_col_name, lookup_c
 
 unmatched_data_test <- unmatched_data_check(lookup, raw_data, input_data_col_name, lookup_col_name)
 
-export_tests <- function(unmatched_lookup_test, unmatched_data_test){
+export_test_results <- function(unmatched_lookup_test, unmatched_data_test){
   timestamp <- format(Sys.time(), "%Y%m%d_%H%M")
   write.csv(unmatched_lookup_test, paste0("output/unmatched_lookup_results_", timestamp, ".csv"), row.names = FALSE)
   write.csv(unmatched_data_test, paste0("output/unmatched_data_results_", timestamp, ".csv"), row.names = FALSE)
 }
 
-export_tests(unmatched_lookup_test, unmatched_data_test)
+export_test_results(unmatched_lookup_test, unmatched_data_test)
 
 ####Preparing data for output####
 
 output_preparation <- function(raw_data_join, lookup, unmatched_lookup_test, input_data_col_name, lookup_col_name){
+  #preparing the human readable data
   data_col_pos <- menu(colnames(raw_data_join), graphics = FALSE, title = "Select the column containing the data variable for publication")
   data_col <- colnames(raw_data_join)[data_col_pos]
   lookup_col_no <- ncol(lookup)
   raw_data_join <- select(raw_data_join, 1:all_of(lookup_col_no), all_of(data_col)) #remove excess columns
   unmatched_lookup_codes <- unmatched_lookup_test[,lookup_col_name]
-  output <- filter(raw_data_join, (raw_data_join[,lookup_col_name] %in% unmatched_lookup_codes) == FALSE)
+  human_output <- filter(raw_data_join, (raw_data_join[,lookup_col_name] %in% unmatched_lookup_codes) == FALSE)
+  #preparing the tidy data sheet
+  machine_output <- human_output %>% unite("Names", 2:ncol(lookup), remove = TRUE, na.rm = TRUE)
+  return(list(human_output, machine_output))
+  
   message("Data ready for output.")
   message("Reminder: Run QA checks before exporting to file to ensure all data is accounted for")
   return(output)
 }
   
-output <- output_preparation(raw_data_join, lookup, unmatched_lookup_test, input_data_col_name, lookup_col_name)  
+output <- output_preparation(raw_data_join, lookup, unmatched_lookup_test, input_data_col_name, lookup_col_name)
+
+human_output <- output[1] %>% unlist()
+machine_output <- output[2] %>% unlist()
 
 ####Excel export formatting####
 
-export_workbook <- function(output){
+export_workbook <- function(human_output, machine_output){
   #styles
   hsbold <- createStyle(textDecoration = "Bold")
   hs1 <- createStyle(fontSize = 18, textDecoration = "Bold")
@@ -226,8 +234,11 @@ export_workbook <- function(output){
   #write data to sheet 2
   writeData(wb, 2, "Layout of geographical areas - accessible version", startCol = "A", startRow = 1)
   writeData(wb, 2, "This worksheet contains one table. The table contains some blank cells due to the layout of the geographical areas.", startCol = "A", startRow = 2)
-  writeData(wb, sheet = 2, output, startCol = "A", startRow = 3, headerStyle = hsbold)
+  writeData(wb, sheet = 2, human_output, startCol = "A", startRow = 3, headerStyle = hsbold)
   addStyle(wb, 2, hs1, rows = 1, cols = 1)
+  
+  #write machine data to sheet 3
+  writeData(wb, sheet = 3, machine_output, startCol = "A", startRow = 1)
   
   #write the workbook
   output_filepath <- readline(prompt = "Insert output filepath and filename, e.g. output/output_file.xlsx :")
