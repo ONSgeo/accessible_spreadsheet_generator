@@ -1,0 +1,240 @@
+Area Code,Country,Nation,International Territorial Level 1,International Territorial Level 2,International Territorial Level 3
+K02000001,United Kingdom,,,,
+K03000001,Great Britain,,,,
+K04000001,England and Wales,,,,
+E92000001,,England,,,
+TLC,,,North East (England),,
+TLC1,,,,Tees Valley and Durham,
+TLC11,,,,,Hartlepool and Stockton-on-Tees
+TLC12,,,,,South Teesside
+TLC13,,,,,Darlington
+TLC14,,,,,Durham
+TLC2,,,,"Northumberland, and Tyne and Wear",
+TLC21,,,,,Northumberland
+TLC22,,,,,Tyneside
+TLC23,,,,,Sunderland
+TLD,,,North West (England),,
+TLD1,,,,Cumbria,
+TLD11,,,,,West Cumbria
+TLD12,,,,,East Cumbria
+TLD3,,,,Greater Manchester,
+TLD33,,,,,Manchester
+TLD34,,,,,Greater Manchester South West
+TLD35,,,,,Greater Manchester South East
+TLD36,,,,,Greater Manchester North West
+TLD37,,,,,Greater Manchester North East
+TLD4,,,,Lancashire,
+TLD41,,,,,Blackburn with Darwen
+TLD42,,,,,Blackpool
+TLD44,,,,,Lancaster and Wyre
+TLD45,,,,,Mid Lancashire
+TLD46,,,,,East Lancashire
+TLD47,,,,,Chorley and West Lancashire
+TLD6,,,,Cheshire,
+TLD61,,,,,Warrington
+TLD62,,,,,Cheshire East
+TLD63,,,,,Cheshire West and Chester
+TLD7,,,,Merseyside,
+TLD71,,,,,East Merseyside
+TLD72,,,,,Liverpool
+TLD73,,,,,Sefton
+TLD74,,,,,Wirral
+TLE,,,Yorkshire and The Humber,,
+TLE1,,,,East Yorkshire and Northern Lincolnshire,
+TLE11,,,,,"Kingston upon Hull, City of"
+TLE12,,,,,East Riding of Yorkshire
+TLE13,,,,,North and North East Lincolnshire
+TLE2,,,,North Yorkshire,
+TLE21,,,,,York
+TLE22,,,,,North Yorkshire CC
+TLE3,,,,South Yorkshire,
+TLE31,,,,,"Barnsley, Doncaster and Rotherham"
+TLE32,,,,,Sheffield
+TLE4,,,,West Yorkshire,
+TLE41,,,,,Bradford
+TLE42,,,,,Leeds
+TLE44,,,,,Calderdale and Kirklees
+TLE45,,,,,Wakefield
+TLF,,,East Midlands (England),,
+TLF1,,,,Derbyshire and Nottinghamshire,
+TLF11,,,,,Derby
+TLF12,,,,,East Derbyshire
+TLF13,,,,,South and West Derbyshire
+TLF14,,,,,Nottingham
+TLF15,,,,,North Nottinghamshire
+TLF16,,,,,South Nottinghamshire
+TLF2,,,,"Leicestershire, Rutland and Northamptonshire",
+TLF21,,,,,Leicester
+TLF22,,,,,Leicestershire CC and Rutland
+TLF24,,,,,West Northamptonshire
+TLF25,,,,,North Northamptonshire
+TLF3,,,,Lincolnshire,
+TLF30,,,,,Lincolnshire CC
+TLG,,,West Midlands (England),,
+TLG1,,,,"Herefordshire, Worcestershire and Warwickshire",
+TLG11,,,,,"Herefordshire, County of"
+TLG12,,,,,Worcestershire CC
+TLG13,,,,,Warwickshire CC
+TLG2,,,,Shropshire and Staffordshire,
+TLG21,,,,,Telford and Wrekin
+TLG22,,,,,Shropshire
+TLG23,,,,,Stoke-on-Trent
+TLG24,,,,,Staffordshire CC
+TLG3,,,,West Midlands,
+TLG31,,,,,Birmingham
+TLG32,,,,,Solihull
+TLG33,,,,,Coventry
+TLG36,,,,,Dudley
+TLG37,,,,,Sandwell
+TLG38,,,,,Walsall
+TLG39,,,,,Wolverhampton
+TLH,,,East,,
+TLH1,,,,East Anglia,
+TLH11,,,,,Peterborough
+TLH12,,,,,Cambridgeshire CC
+TLH14,,,,,Suffolk CC
+TLH15,,,,,Norwich and East Norfolk
+TLH16,,,,,North and West Norfolk
+TLH17,,,,,Breckland and South Norfolk
+TLH2,,,,Bedfordshire and Hertfordshire,
+TLH21,,,,,Luton
+TLH23,,,,,Hertfordshire CC
+TLH24,,,,,Bedford
+TLH25,,,,,Central Bedfordshire
+TLH3,,,,Essex,
+TLH31,,,,,Southend-on-Sea
+TLH32,,,,,Thurrock
+TLH34,,,,,Essex Haven Gateway
+TLH35,,,,,West Essex
+TLH36,,,,,Heart of Essex
+TLH37,,,,,Essex Thames Gateway
+TLI,,,London,,
+TLI3,,,,Inner London - West,
+TLI31,,,,,Camden and City of London
+TLI32,,,,,Westminster
+TLI33,,,,,Kensington & Chelsea and Hammersmith & Fulham
+TLI34,,,,,Wandsworth
+TLI4,,,,Inner London - East,
+TLI41,,,,,Hackney and Newham
+TLI42,,,,,Tower Hamlets
+TLI43,,,,,Haringey and Islington
+TLI44,,,,,Lewisham and Southwark
+TLI45,,,,,Lambeth
+TLI5,,,,Outer London - East and North East,
+TLI51,,,,,Bexley and Greenwich
+TLI52,,,,,Barking & Dagenham and Havering
+TLI53,,,,,Redbridge and Waltham Forest
+TLI54,,,,,Enfield
+TLI6,,,,Outer London - South,
+TLI61,,,,,Bromley
+TLI62,,,,,Croydon
+TLI63,,,,,"Merton, Kingston upon Thames and Sutton"
+TLI7,,,,Outer London - West and North West,
+TLI71,,,,,Barnet
+TLI72,,,,,Brent
+TLI73,,,,,Ealing
+TLI74,,,,,Harrow and Hillingdon
+TLI75,,,,,Hounslow and Richmond upon Thames
+TLJ,,,South East (England),,
+TLJ1,,,,"Berkshire, Buckinghamshire and Oxfordshire",
+TLJ11,,,,,Berkshire
+TLJ12,,,,,Milton Keynes
+TLJ13,,,,,Buckinghamshire
+TLJ14,,,,,Oxfordshire CC
+TLJ2,,,,"Surrey, East and West Sussex",
+TLJ21,,,,,Brighton and Hove
+TLJ22,,,,,East Sussex CC
+TLJ25,,,,,West Surrey
+TLJ26,,,,,East Surrey
+TLJ27,,,,,West Sussex (South West)
+TLJ28,,,,,West Sussex (North East)
+TLJ3,,,,Hampshire and Isle of Wight,
+TLJ31,,,,,Portsmouth
+TLJ32,,,,,Southampton
+TLJ34,,,,,Isle of Wight
+TLJ35,,,,,South Hampshire
+TLJ36,,,,,Central Hampshire
+TLJ37,,,,,North Hampshire
+TLJ4,,,,Kent,
+TLJ41,,,,,Medway
+TLJ43,,,,,Kent Thames Gateway
+TLJ44,,,,,East Kent
+TLJ45,,,,,Mid Kent
+TLJ46,,,,,West Kent
+TLK,,,South West (England),,
+TLK1,,,,"Gloucestershire, Wiltshire and Bath/Bristol area",
+TLK11,,,,,"Bristol, City of"
+TLK12,,,,,"Bath and North East Somerset, North Somerset and South Gloucestershire"
+TLK13,,,,,Gloucestershire CC
+TLK14,,,,,Swindon
+TLK15,,,,,Wiltshire
+TLK2,,,,Dorset and Somerset,
+TLK23,,,,,Somerset CC
+TLK24,,,,,"Bournemouth, Christchurch and Poole"
+TLK25,,,,,Dorset
+TLK3,,,,Cornwall and Isles of Scilly,
+TLK30,,,,,Cornwall and Isles of Scilly
+TLK4,,,,Devon,
+TLK41,,,,,Plymouth
+TLK42,,,,,Torbay
+TLK43,,,,,Devon CC
+W92000004,,Wales,,,
+TLL,,,Wales,,
+TLL1,,,,West Wales and The Valleys,
+TLL11,,,,,Isle of Anglesey
+TLL12,,,,,Gwynedd
+TLL13,,,,,Conwy and Denbighshire
+TLL14,,,,,South West Wales
+TLL15,,,,,Central Valleys
+TLL16,,,,,Gwent Valleys
+TLL17,,,,,Bridgend and Neath Port Talbot
+TLL18,,,,,Swansea
+TLL2,,,,East Wales,
+TLL21,,,,,Monmouthshire and Newport
+TLL22,,,,,Cardiff and Vale of Glamorgan
+TLL23,,,,,Flintshire and Wrexham
+TLL24,,,,,Powys
+S92000003,,Scotland,,,
+TLM,,,Scotland,,
+TLM5,,,,North Eastern Scotland,
+TLM50,,,,,Aberdeen City and Aberdeenshire
+TLM6,,,,Highlands and Islands,
+TLM61,,,,,"Caithness and Sutherland, and Ross and Cromarty"
+TLM62,,,,,"Inverness and Nairn, Moray, and Badenoch and Strathspey"
+TLM63,,,,,"Lochaber, Skye and Lochalsh, Arran and Cumbrae, and Argyll and Bute"
+TLM64,,,,,Na h-Eileanan Siar
+TLM65,,,,,Orkney Islands
+TLM66,,,,,Shetland Islands
+TLM7,,,,Eastern Scotland,
+TLM71,,,,,Angus and Dundee City
+TLM72,,,,,Clackmannanshire and Fife
+TLM73,,,,,East Lothian and Midlothian
+TLM75,,,,,City of Edinburgh
+TLM76,,,,,Falkirk
+TLM77,,,,,"Perth and Kinross, and Stirling"
+TLM78,,,,,West Lothian
+TLM8,,,,West Central Scotland,
+TLM81,,,,,"East Dunbartonshire, West Dunbartonshire, and Helensburgh and Lomond"
+TLM82,,,,,Glasgow City
+TLM83,,,,,"Inverclyde, East Renfrewshire, and Renfrewshire"
+TLM84,,,,,North Lanarkshire
+TLM9,,,,Southern Scotland,
+TLM91,,,,,Scottish Borders
+TLM92,,,,,Dumfries and Galloway
+TLM93,,,,,East Ayrshire and North Ayrshire mainland
+TLM94,,,,,South Ayrshire
+TLM95,,,,,South Lanarkshire
+N92000002,,Northern Ireland,,,
+TLN,,,Northern Ireland,,
+TLN0,,,,Northern Ireland,
+TLN06,,,,,Belfast
+TLN07,,,,,"Armagh City, Banbridge and Craigavon"
+TLN08,,,,,"Newry, Mourne and Down"
+TLN09,,,,,Ards and North Down
+TLN0A,,,,,Derry City and Strabane
+TLN0B,,,,,Mid Ulster
+TLN0C,,,,,Causeway Coast and Glens
+TLN0D,,,,,Antrim and Newtownabbey
+TLN0E,,,,,Lisburn and Castlereagh
+TLN0F,,,,,Mid and East Antrim
+TLN0G,,,,,Fermanagh and Omagh
