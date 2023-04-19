@@ -58,13 +58,15 @@ lookup_loader <- function(raw_data, unique_entities){
   itl_entities <- c("TLN", "TLM", "TLD", "TLC", "TLE", "TLL", "TLG", "TLF", "TLH", "TLJ", "TLI", "TLK")
   census_entities <- c("E00", "S00", "W00", "N00", "E01", "S01", "W01", "E02", "S02", "W02")
   
+  admin_18_link <- "lookups/CTRY18_NAT18_RGN18_CTYUA18_LAD18_lookup.csv"
+  admin_19_link <- "lookups/CTRY19_NAT19_RGN19_CTYUA20_LAD19_lookup.csv"
   admin_20_link <- "lookups/CTRY20_NAT20_RGN20_CTYUA20_LAD20_lookup.csv"
   admin_21_link <- "lookups/CTRY21_NAT21_RGN21_CTYUA21_LAD21_lookup.csv"
   admin_22_link <- "lookups/CTRY22_NAT22_RGN22_CTYUA22_LAD22_lookup.csv"
-  admin_link <- c(admin_20_link, admin_21_link, admin_22_link) #make sure all admin lookups are included in this vector
+  admin_link <- c(admin_18_link, admin_19_link, admin_20_link, admin_21_link, admin_22_link) #make sure all admin lookups are included in this vector
   health_link <- "lookups/CTRY21_NAT21_NHSER21_STP21_CCG21_LAD21_lookup.csv"
   census_link <- "lookups/MSOA21_LSOA21_OA21_lookup.csv"
-  itl_link <- "lookups/ITL121_ITL221_ITL321_lookup.csv"
+  itl_link <- "lookups/CTRY21_NAT21_ITL121_ITL221_ITL321_lookup.csv"
   
   ##function actions begin here##
   admin_code_pos <- menu(colnames(raw_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes in the input data:")
@@ -73,8 +75,11 @@ lookup_loader <- function(raw_data, unique_entities){
   #produces a vector with the associated lookup links
   #when adding new years of lookups, they **MUST** be above the older ones of the same geography (case_when works from top to bottom - newest lookup to oldest)
   #hierarchies that have multiple years associated with them are selected by individual GSS codes that underwent changes in that particular year
-  lookup_link <- case_when((unique_entities %in% admin_entities & ("E06000061" %in% raw_data[,admin_code_name]|"E06000062" %in% raw_data[,admin_code_name])) ~ admin_21_link,
+  lookup_link <- case_when(unique_entities %in% admin_entities ~ admin_22_link,
+                           (unique_entities %in% admin_entities & ("E06000061" %in% raw_data[,admin_code_name]|"E06000062" %in% raw_data[,admin_code_name])) ~ admin_21_link,
                            (unique_entities %in% admin_entities & ("E06000060" %in% raw_data[,admin_code_name])) ~ admin_20_link,
+                           (unique_entities %in% admin_entities & ("E10000002" %in% raw_data[,admin_code_name])) ~ admin_19_link,
+                           (unique_entities %in% admin_entities & ("E06000029" %in% raw_data[,admin_code_name]|"E06000028" %in% raw_data[,admin_code_name])) ~ admin_18_link,
                            unique_entities %in% health_entities ~ health_link,
                            unique_entities %in% itl_entities ~ itl_link,
                            unique_entities %in% census_entities ~ census_link) %>% discard(is.na)

@@ -24,10 +24,6 @@ source("accessible_spreadsheet_functions.R")
 #requires a user interaction in the console to input the location filepath and select the geography code column
 raw_data <- load_user_data()
 
-#Delete before publishing
-#data/Happiness.csv
-#data/wellbeing_testdata_2021.csv
-
 #creates a vector of all unique entity codes in the input data
 #this is used later in the lookup selection process
 unique_entities <- create_unique_entities(raw_data)
