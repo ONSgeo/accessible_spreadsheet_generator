@@ -17,9 +17,9 @@ load_user_data <- function(){
   if(grepl(".csv", filepath) == TRUE){ 
     if(file.exists(filepath) == TRUE){
       user_data <- read.csv(filepath)
-      AREACD_pos <- menu(colnames(user_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes")
-      AREACD <- colnames(user_data)[AREACD_pos] #converting the position of the AREACD_pos into the column name instead
-      user_data <- user_data %>% mutate(ENTCD = str_sub(.[,AREACD], 1, 3)) #keeps the first 3 characters of the AREACD and creates new col - ENTCD
+      GSSCD_pos <- menu(colnames(user_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes")
+      GSSCD <- colnames(user_data)[GSSCD_pos] #converting the position of the GSSCD_pos into the column name instead - This variable must not be named the same as the code column, else it will break
+      user_data <- user_data %>% mutate(ENTCD = str_sub(.[,GSSCD], 1, 3)) #keeps the first 3 characters of the GSSCD and creates new col - ENTCD
       message("Input data successfully loaded")
       return(user_data)
     } else if(file.exists(filepath) == FALSE){
@@ -29,9 +29,9 @@ load_user_data <- function(){
   } else if (grepl(".xls", filepath) == TRUE){
     if(file.exists(filepath) == TRUE){
       user_data <- read_excel(filepath)
-      AREACD_pos <- menu(colnames(user_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes")
-      AREACD <- colnames(user_data)[AREACD_pos]
-      user_data <- user_data %>% mutate(ENTCD = str_sub(.[,AREACD], 1, 3))
+      GSSCD_pos <- menu(colnames(user_data), graphics = FALSE, title = "Select the column containing the GSS Geography Codes")
+      GSSCD <- colnames(user_data)[GSSCD_pos]
+      user_data <- user_data %>% mutate(ENTCD = str_sub(.[,GSSCD], 1, 3))
       message("Input data successfully loaded")
       return(user_data)
     } else if(file.exists(filepath) == FALSE){
