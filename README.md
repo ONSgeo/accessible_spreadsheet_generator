@@ -18,10 +18,10 @@ The following geograhpic hierarchies are available in this tool at present:
 ## How to use the tool
 1) Locate an R user 
 2) Ensure the R user has a functional install of R and R studio
-3) Pull the repo to download a local copy of the project
+3) Pull the repo to download a local copy of the project - How-to guide can be found here: https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository
 4) Open the project in R studio and open accessible_spreadsheet.R
 5) Load the libraries and custom functions using the code at the top of the script.
-6) To process your data run the functions in the *Load and prepare data* section one by one, noting user required inputs
+6) To process your data run the functions in the *Load and prepare data* section one by one, noting user required inputs. Prompts will appear in the console pane.
 7) Run the functions in the *QA Checks* section to ensure all your data has been accounted for. Users should note that **the outputs of these checks should be manually inspected and fully understood before undertaking the rest of the process**. 
 8) Finally, continue with the *Data Output* section functions to finalise and produce the Excel output. 
 
